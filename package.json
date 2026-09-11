@@ -1,0 +1,25 @@
+{
+  "name": "e2e_automation",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:headed": "playwright test --headed",
+    "test:registration": "playwright test tests/registration",
+    "test:login": "playwright test tests/login",
+    "test:account-security": "playwright test tests/account-security",
+    "test:debug": "playwright test --debug",
+    "report": "playwright show-report",
+    "typecheck": "tsc --noEmit"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "E2E automation for E2Language student registration flows.",
+  "devDependencies": {
+    "@playwright/test": "^1.63.0",
+    "@types/node": "^26.5.0",
+    "dotenv": "^17.4.2",
+    "typescript": "^7.0.2"
+  }
+}

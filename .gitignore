@@ -1,0 +1,9 @@
+node_modules/
+dist/
+test-results/
+playwright-report/
+playwright/.cache/
+.env
+*.png
+*.webm
+.DS_Store
