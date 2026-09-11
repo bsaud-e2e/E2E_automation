@@ -30,6 +30,12 @@ npm run typecheck             # tsc --noEmit
 
 A full run takes roughly 5–6 minutes against the live staging environment — most of that is waiting on real Azure B2C redirects and the free-trial onboarding wizard, not test logic.
 
+## Continuous Integration
+
+`.github/workflows/e2e-tests.yml` runs the full suite on every push to any branch (and can be triggered manually from the Actions tab). It type-checks, installs Chromium, runs `npm test`, and uploads the HTML report (plus traces/videos on failure) as workflow artifacts.
+
+Since every run performs real registrations and real Shopify test-card payments against the live staging environment, pushing frequently means creating staging test accounts frequently — narrow the `on.push.branches` filter in the workflow if that becomes noisy (e.g. to `main` only).
+
 ## Project structure
 
 ```
