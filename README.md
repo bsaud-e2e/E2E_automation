@@ -36,6 +36,12 @@ A full run takes roughly 5–6 minutes against the live staging environment — 
 
 Since every run performs real registrations and real Shopify test-card payments against the live staging environment, pushing frequently means creating staging test accounts frequently — narrow the `on.push.branches` filter in the workflow if that becomes noisy (e.g. to `main` only).
 
+### QA Agent (automated failure triage)
+
+After the suite runs, `scripts/qa-report.js` reads `results.json` (Playwright's JSON reporter output), and if there are any failures, sends them to DeepSeek's API for classification (Automation/locator, Timing/wait, Test-data, Environment, or Application defect — with a known `SecurityError`/microfrontend false-positive pattern hard-coded to never be reported as a real defect). It posts the resulting report as a comment on the pushed branch's open PR, or prints it to the workflow log if there isn't one. Requires a `DEEPSEEK_API_KEY` repo secret (Settings → Secrets and variables → Actions) — without it, this step fails but the test run and artifact upload are unaffected.
+
+There's a second, separate QA tool in `.claude/agents/qa-agent.md` — a Claude Code subagent with the same classification rules, for interactive use (`Agent(subagent_type: "qa-agent")` from a Claude Code session) rather than unattended CI runs.
+
 ## Project structure
 
 ```

@@ -9,6 +9,10 @@ concurrency:
   group: e2e-tests-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: read
+  pull-requests: write
+
 jobs:
   playwright:
     name: Run Playwright suite
@@ -35,6 +39,13 @@ jobs:
 
       - name: Run E2E suite
         run: npm test
+
+      - name: QA Agent - analyze results and report
+        if: always()
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/qa-report.js
 
       - name: Upload Playwright HTML report
         if: always()

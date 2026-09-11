@@ -2,6 +2,7 @@ node_modules/
 dist/
 test-results/
 playwright-report/
+results.json
 playwright/.cache/
 .env
 *.png
