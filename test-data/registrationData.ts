@@ -55,9 +55,14 @@ export const PAYMENT_GATEWAY_HOST = 'https://e2-staging-store.myshopify.com';
  * one-time promo claim, an extension). Confirmed live 2026-09-10 that all
  * three tier accounts below still authenticate; the "no-arg" package-upgrade
  * cases (047/049/052) only read state (which upgrade tiers are offered) so
- * are safe to reuse across runs, but test_ptefree28's extend-trial
- * promotion had already been claimed by a prior run when checked - treat
- * one-time-offer fixtures as already spent unless re-verified live.
+ * are safe to reuse across runs, but expiredFreeTrial's extend-trial survey
+ * is one-time-per-account - treat it as spent once TC-STU-018 has run
+ * against it (TC-STU-017 detects this and skips rather than faking a
+ * result - see tests/dashboard/extend-trial-survey.spec.ts). The original
+ * test_ptefree28@mailinator.com had already used its one survey; a fresh
+ * expired-free (not expired-paid - tdse2-dpaid-5@mailinator.com was tried
+ * and turned out to be a paid Express account, confirmed live) account
+ * should replace the default below once the current one is spent too.
  */
 export const FIXTURE_ACCOUNTS = {
   powerTier: {
@@ -73,7 +78,7 @@ export const FIXTURE_ACCOUNTS = {
     password: process.env.FIXTURE_EXPRESS_EXTRA_TIER_PASSWORD || 'TestPass123!',
   },
   expiredFreeTrial: {
-    email: process.env.FIXTURE_EXPIRED_FREE_TRIAL_EMAIL || 'test_ptefree28@mailinator.com',
+    email: process.env.FIXTURE_EXPIRED_FREE_TRIAL_EMAIL || 'student-pte-123@mailinator.com',
     password: process.env.FIXTURE_EXPIRED_FREE_TRIAL_PASSWORD || 'Temp@1234',
   },
   paidForExtension: {
