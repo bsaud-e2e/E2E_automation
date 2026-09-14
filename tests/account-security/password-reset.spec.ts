@@ -59,13 +59,17 @@ test.describe('Password Reset', () => {
   // 6-digit code typed into the page, not a clickable link. Retrieves the
   // real OTP from the account's public @mailinator.com inbox (no login
   // needed for a public Mailinator inbox) to drive the flow end-to-end
-  // rather than stopping at "an email was sent". This spec covers request +
-  // OTP retrieval + verification (the reset flow's Continue button becoming
-  // enabled, which requires the code to have been accepted as correct) -
-  // the same kind of intentionally-scoped coverage as TC-STU-028, since the
-  // B2C policy's subsequent "set new password" step only renders once
-  // Continue is submitted and wasn't reliably reproducible during
-  // exploration.
+  // rather than stopping at "an email was sent". Success is verified by
+  // intercepting the actual B2C API call each step makes
+  // (SelfAsserted/DisplayControlAction) and checking its JSON body's own
+  // "status" field, rather than scraping UI text/button-visibility as a
+  // proxy - confirmed live this endpoint always answers HTTP 200 at the
+  // transport layer even when the code is wrong, so the body's status field
+  // is the real signal. This spec covers request + OTP retrieval +
+  // verification - the same kind of intentionally-scoped coverage as
+  // TC-STU-028, since the B2C policy's subsequent "set new password" step
+  // only renders once Continue is submitted and wasn't reliably
+  // reproducible during exploration.
   test('TC-STU-056: Student receives and verifies the password-reset OTP by email', async ({ page, context }) => {
     test.setTimeout(240_000);
     const { email } = await registerFreeStudent(page, 'e2e.stu.otpreset');
@@ -75,18 +79,14 @@ test.describe('Password Reset', () => {
     const forgotPasswordPage = new ForgotPasswordPage(page);
     await loginPage.gotoLogin();
     await loginPage.clickForgotPassword();
-    await forgotPasswordPage.requestReset(email);
-    await expect(async () => {
-      expect(await forgotPasswordPage.getConfirmationText()).toMatch(/verification code has been sent/i);
-    }).toPass({ timeout: 15_000 });
+
+    const sendResult = await forgotPasswordPage.requestResetAndGetApiResult(email);
+    expect(sendResult.status).toBe('200');
 
     const code = await fetchVerificationCode(context, inboxName);
     expect(code).toBeTruthy();
 
-    await forgotPasswordPage.enterAndVerifyCode(code as string);
-
-    // Expected result (partial - see comment above): the OTP is accepted,
-    // enabling the flow to continue past email verification.
-    await expect(page.locator('#continue')).toBeVisible({ timeout: 15_000 });
+    const verifyResult = await forgotPasswordPage.enterAndVerifyCodeGetApiResult(code as string);
+    expect(verifyResult.status).toBe('200');
   });
 });

@@ -26,10 +26,30 @@ export class ForgotPasswordPage extends BasePage {
     this.verifyCodeButton = page.locator('#emailVerificationControl_but_verify_code');
   }
 
+  /**
+   * B2C's SelfAsserted/DisplayControlAction endpoint backs both "Send
+   * verification code" and "Verify code" - confirmed live via network
+   * capture. It always answers HTTP 200 at the transport layer (even for a
+   * rejected/wrong code); the real result is the JSON body's own "status"
+   * field (e.g. "200" on success), so that's what callers should check
+   * rather than the HTTP status alone.
+   */
+  private waitForDisplayControlAction() {
+    return this.page.waitForResponse((res) => res.url().includes('SelfAsserted/DisplayControlAction'));
+  }
+
   async requestReset(email: string): Promise<void> {
     await this.emailInput.waitFor({ state: 'visible', timeout: 15_000 });
     await this.humanType(this.emailInput, email);
     await this.humanClick(this.sendCodeButton);
+  }
+
+  /** Same as requestReset(), but resolves with the send-code API call's parsed JSON body. */
+  async requestResetAndGetApiResult(email: string): Promise<{ status: string }> {
+    const responsePromise = this.waitForDisplayControlAction();
+    await this.requestReset(email);
+    const response = await responsePromise;
+    return response.json();
   }
 
   async getConfirmationText(): Promise<string> {
@@ -45,5 +65,13 @@ export class ForgotPasswordPage extends BasePage {
     await this.verificationCodeInput.waitFor({ state: 'visible', timeout: 10_000 });
     await this.humanType(this.verificationCodeInput, code);
     await this.humanClick(this.verifyCodeButton);
+  }
+
+  /** Same as enterAndVerifyCode(), but resolves with the verify-code API call's parsed JSON body. */
+  async enterAndVerifyCodeGetApiResult(code: string): Promise<{ status: string }> {
+    const responsePromise = this.waitForDisplayControlAction();
+    await this.enterAndVerifyCode(code);
+    const response = await responsePromise;
+    return response.json();
   }
 }
