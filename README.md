@@ -46,6 +46,17 @@ There's a second, separate QA tool in `.claude/agents/qa-agent.md` — a Claude 
 
 A third job, `playwright-known-issues` (also non-blocking), runs the specs listed in "Known findings" below that are written to assert the *correct* app behavior per the Excel sheet and are known to currently fail — either a confirmed application defect or Mailinator email-delivery timing. They stay in the suite (not deleted) so a real regression, or the day the defect is fixed, is still visible.
 
+### Self-hosted runner setup (for `playwright-payment`)
+
+The Shopify staging checkout these specs complete is blocked from GitHub-hosted runners' shared cloud IPs (see "Known findings" below), so `playwright-payment` runs on a self-hosted runner instead of `ubuntu-latest`. To register one:
+
+1. In the repo, go to **Settings → Actions → Runners → New self-hosted runner**, and pick the OS/architecture of the machine you're using (any box with a stable, non-datacenter IP works — a spare machine, a small VM, even a desktop that stays on).
+2. Follow the download + `./config.sh` commands GitHub shows on that page. It'll prompt for labels — add **`e2e-payment`** in addition to the default `self-hosted` label (the workflow targets `runs-on: [self-hosted, e2e-payment]` specifically, so it won't pick up unrelated jobs on a runner used for other repos/purposes).
+3. Start it with `./run.sh` for a one-off, or install it as a background service (GitHub's setup page shows `./svc.sh install && ./svc.sh start` for this) so it survives reboots and keeps polling for jobs.
+4. Node 20 and Chromium get installed fresh by the workflow itself (`actions/setup-node` + `npx playwright install --with-deps chromium`) — no manual dependency setup needed on the runner beyond a working `git`/internet connection. `--with-deps` only installs system packages on Linux (via `apt-get`, needs sudo); on macOS it's a no-op and just downloads the browser binary.
+
+Until a runner with both labels is online, `playwright-payment` will simply queue rather than run — `continue-on-error: true` means this won't fail the overall workflow, but the job also won't complete, so its status will show as pending/cancelled after the timeout rather than pass or fail.
+
 ## Project structure
 
 ```

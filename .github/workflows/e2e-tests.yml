@@ -81,13 +81,22 @@ jobs:
 
   playwright-payment:
     name: Run payment-completing specs (non-blocking)
-    runs-on: ubuntu-latest
+    # Runs on a self-hosted runner instead of GitHub's shared ubuntu-latest
+    # pool: the Shopify staging checkout redirect these specs depend on is
+    # blocked from GitHub-hosted runners' cloud IPs (confirmed working
+    # locally / from a residential IP every time - see the README's "Known
+    # findings"), most likely by the store's own Cloudflare/WAF flagging
+    # GitHub's shared datacenter IP ranges. A self-hosted runner's fixed,
+    # non-flagged IP sidesteps that without allowlisting GitHub's entire
+    # (~7,000-entry, constantly-changing) Actions IP range.
+    #
+    # Requires a runner registered against this repo with BOTH labels
+    # below (Settings > Actions > Runners > New self-hosted runner) - see
+    # the "Self-hosted runner setup" section in the README for the exact
+    # steps. continue-on-error stays on: if no such runner is online, this
+    # job queues/times out rather than failing the workflow outright.
+    runs-on: [self-hosted, e2e-payment]
     timeout-minutes: 30
-    # Known environment limitation, not a pipeline gate: the Shopify staging
-    # checkout redirect these specs depend on is unreliable from GitHub's
-    # runner IPs (confirmed working locally / from a residential IP every
-    # time). This job still runs and reports so a real regression elsewhere
-    # in these specs is still visible, but it never fails the workflow.
     continue-on-error: true
     steps:
       - name: Check out repo
