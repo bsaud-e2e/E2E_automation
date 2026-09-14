@@ -101,4 +101,22 @@ export const FIXTURE_ACCOUNTS = {
     email: process.env.FIXTURE_PAID_FOR_EXTENSION_EMAIL || 'demo-selfgraded4@mailinator.com',
     password: process.env.FIXTURE_PAID_FOR_EXTENSION_PASSWORD || 'Temp@1234',
   },
+  // TC-E2E-054 (view teacher's graded feedback). Read-only - safe
+  // indefinitely. Confirmed live 2026-09-15 to have a teacher-graded
+  // Write Email submission (Score 17). The Assessments grid itself hits
+  // the same broken accordion-population defect as TC-E2E-053 (clicking
+  // to expand never actually loads row data via automation, confirmed
+  // live even after a full expand+wait), so this submission's known
+  // direct URL is used instead of the grid click path - see
+  // GRADED_SUBMISSION_URL below and tests/assessments/graded-feedback.spec.ts.
+  gradedSubmission: {
+    email: process.env.FIXTURE_GRADED_SUBMISSION_EMAIL || 'kadaj29422@prorises.com',
+    password: process.env.FIXTURE_GRADED_SUBMISSION_PASSWORD || 'P@ssw0rd',
+  },
 };
+
+// The one confirmed-graded submission on the gradedSubmission fixture
+// account (PTE Core "Write Email", activityId 1001045, Score 17) - see
+// the FIXTURE_ACCOUNTS.gradedSubmission comment above for why this is
+// reached directly rather than through the (broken) Assessments grid.
+export const GRADED_SUBMISSION_URL = `${STUDENT_APP_HOST}/Student/PteCoreWriteEmail/View?activityId=1001045`;
