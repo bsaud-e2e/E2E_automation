@@ -48,7 +48,26 @@ export class SwitchCoursePage extends BasePage {
     await this.humanClick(radio);
   }
 
+  /**
+   * Clicking "Convert Course Now!" only raises a second confirmation dialog
+   * ("You will be redirected to payment page. Do you want to continue?")
+   * when the switch actually costs something - confirmed live: a
+   * no-cost/free switch (TC-STU-012) goes straight to
+   * ChangePackageConfirmation with no dialog at all, while a paid switch
+   * (TC-STU-013) shows it. So this dialog is handled as optional.
+   */
   async convertCourseNow(): Promise<void> {
     await this.humanClick(this.convertCourseNowLink);
+    const confirmYesButton = this.page.locator('.modal:visible button', { hasText: /^Yes$/i }).first();
+    // isVisible() doesn't retry/wait for the modal's render animation, so
+    // waitFor() (which does) is used and its timeout treated as "no dialog
+    // for this no-cost switch" rather than a failure.
+    const dialogAppeared = await confirmYesButton
+      .waitFor({ state: 'visible', timeout: 10_000 })
+      .then(() => true)
+      .catch(() => false);
+    if (dialogAppeared) {
+      await this.humanClick(confirmYesButton);
+    }
   }
 }

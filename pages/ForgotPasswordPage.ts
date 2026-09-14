@@ -13,6 +13,8 @@ export class ForgotPasswordPage extends BasePage {
   readonly sendCodeButton: Locator;
   readonly confirmationArea: Locator;
   readonly cancelButton: Locator;
+  readonly verificationCodeInput: Locator;
+  readonly verifyCodeButton: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -20,6 +22,8 @@ export class ForgotPasswordPage extends BasePage {
     this.sendCodeButton = page.locator('#emailVerificationControl_but_send_code');
     this.confirmationArea = page.locator('#api');
     this.cancelButton = page.locator('#cancel');
+    this.verificationCodeInput = page.locator('#VerificationCode');
+    this.verifyCodeButton = page.locator('#emailVerificationControl_but_verify_code');
   }
 
   async requestReset(email: string): Promise<void> {
@@ -30,5 +34,16 @@ export class ForgotPasswordPage extends BasePage {
 
   async getConfirmationText(): Promise<string> {
     return (await this.confirmationArea.innerText()).replace(/\s+/g, ' ').trim();
+  }
+
+  /**
+   * Enters the emailed 6-digit OTP into the "Secondary Verification Code"
+   * field and clicks Verify code - confirmed live: this enables the
+   * Continue button for the rest of the reset flow.
+   */
+  async enterAndVerifyCode(code: string): Promise<void> {
+    await this.verificationCodeInput.waitFor({ state: 'visible', timeout: 10_000 });
+    await this.humanType(this.verificationCodeInput, code);
+    await this.humanClick(this.verifyCodeButton);
   }
 }

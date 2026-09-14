@@ -42,6 +42,8 @@ After the suite runs, `scripts/qa-report.js` reads `results.json` (Playwright's 
 
 There's a second, separate QA tool in `.claude/agents/qa-agent.md` — a Claude Code subagent with the same classification rules, for interactive use (`Agent(subagent_type: "qa-agent")` from a Claude Code session) rather than unattended CI runs.
 
+A third job, `playwright-known-issues` (also non-blocking), runs the specs listed in "Known findings" below that are written to assert the *correct* app behavior per the Excel sheet and are known to currently fail — either a confirmed application defect or Mailinator email-delivery timing. They stay in the suite (not deleted) so a real regression, or the day the defect is fixed, is still visible.
+
 ## Project structure
 
 ```
@@ -51,9 +53,15 @@ pages/                    Page Object Model
   LoginPage.ts               shared Azure B2C login page
   DashboardPage.ts            Student/Home - profile menu, logout
   OnboardingWizardPage.ts      generic completion of the post-registration wizard
-  ForgotPasswordPage.ts         B2C forgot-password flow
+  ForgotPasswordPage.ts         B2C forgot-password flow + email-OTP reset completion
   PaymentPage.ts                  Payment Information page + Shopify checkout
   ScoreCalculatorPage.ts           System Requirement Checker -> ~24 questions -> score report
+  SwitchCoursePage.ts               Switch My Course exam-type change + fee payment
+  UpgradeAccountPage.ts              Upgrade Account package-tier grid
+  ExtendPackagePage.ts                Paid-package "Access Period Expired" extend flow
+  ExtendTrialSurveyPage.ts             Free-trial-expired "Extend Trial" survey (2 branches)
+  StudyPathwayWidgetPage.ts             Student/Home's Study Pathway microfrontend widget
+  RecordedClassesPage.ts, ShopPage.ts    Recorded classes / E2 Shop
 
 test-data/
   registrationData.ts       hosts, packages, test emails/domains, test cards — sourced from the Excel sheet
@@ -61,13 +69,20 @@ test-data/
 utils/
   dataGenerator.ts          unique test-email generator
   testUser.ts                 registerFreeStudent() / createOnboardedStudent() fixtures
+  mailinator.ts                 fetchVerificationCode() - reads a public @mailinator.com inbox for an OTP
 
 tests/
   fixtures.ts                custom test/expect wrapper (see "Bot detection" below)
   registration/               free & paid registration, negative paths, payment method visibility
   login/                        login, logout, session scope
-  account-security/              password reset
-  score-calculator/               System Requirement Checker through to the score report
+  account-security/              password reset (request, no-leak check, full OTP completion)
+  dashboard/                       Study Pathway widget, extend-trial survey
+  upgrades/                          free/paid upgrades, package allow-list, switch course
+  score-calculator/                   System Requirement Checker through to the score report
+  online-classes/                      recorded classes, Writing practice (known-issue)
+  assessments/                          Writing/Speaking Assessments menu (known-issue)
+  shop/                                   E2 Shop tutorial add-on
+  extend-package/                          paid-package extension
 ```
 
 ## Test coverage
@@ -84,8 +99,32 @@ tests/
 | TC-STU-055 | Student requests a password reset email | `tests/account-security/password-reset.spec.ts` |
 | TC-STU-057 | Password reset doesn't reveal whether an email exists | `tests/account-security/password-reset.spec.ts` |
 | TC-STU-072 | Student completes the Score Calculator (V2) and receives a score report | `tests/score-calculator/score-calculator.spec.ts` |
+| TC-STU-013 | Paid student switches course and pays the fee | `tests/upgrades/switch-course.spec.ts` |
+| TC-STU-017 | Expired free student extends trial by 1 week | `tests/dashboard/extend-trial-survey.spec.ts` |
+| TC-STU-018 | Financial-constraint survey answer unlocks a 40% voucher | `tests/dashboard/extend-trial-survey.spec.ts` |
+| TC-STU-043 | Free→Power upgrade check (asserts the app's actual current behavior — see Known findings) | `tests/upgrades/free-to-power-upgrade.spec.ts` |
+| TC-STU-056 | Student resets password via emailed OTP (known-issue — Mailinator delivery timing) | `tests/account-security/password-reset.spec.ts` |
+| TC-STU-081 | Score Calculator menu visible for free and paid students | `tests/dashboard/study-pathway-widget.spec.ts` |
+| TC-STU-091 | Study Pathway widget loads its skill-category panels | `tests/dashboard/study-pathway-widget.spec.ts` |
+| TC-STU-092 | Study Pathway skill tracks tagged Essential with % completion | `tests/dashboard/study-pathway-widget.spec.ts` |
+| TC-STU-093 | Study Pathway Info Modal opens and dismisses cleanly | `tests/dashboard/study-pathway-widget.spec.ts` |
+| TC-STU-065 / 066 | Writing practice submission + AI score report (known-issue — app defect) | `tests/online-classes/writing-practice.spec.ts` |
+| TC-STU-075 / 076 | Study Pathway practice item opens (known-issue — app defect) | `tests/dashboard/study-pathway-unlock.spec.ts` |
+| TC-STU-097 / 104 | Assessments-menu Writing/Speaking submission (known-issue — app defect) | `tests/assessments/writing-speaking-assessments.spec.ts` |
 
 Plus supporting specs not tied to a single TC ID: free-trial registration happy path and field validation (`tests/registration/free-registration.spec.ts`), and a duplicate-email registration check (`tests/registration/registration-negative.spec.ts`).
+
+### Smoke-case gap analysis (2026-09-14)
+
+Of the 22 remaining Smoke-type Student cases identified against the sheet, 15 are automated above and 7 are out of scope with no automation written, to avoid faking a pass against something that isn't reachable:
+
+- **TC-STU-031** (Express Checkout) — the sheet's own investigation found no genuine anonymous single-email-entry checkout URL exists in this environment.
+- **TC-E2E-003 / TC-E2E-005** — the "Write Email" assessment entry point is a confirmed, reproducible app defect (produces no effect, `SecurityError` in the console); TC-E2E-005 depends on grading a submission that can never be made, and additionally needs a cross-role Teacher session.
+- **TC-STU-063** (Content Tool ROPC auto-login) — no CELPIP/GRE/SAT test account exists in this environment, and the activity-launch button it depends on is separately broken.
+- **TC-STU-067** (join a live class) — requires an Admin to schedule one first; the Admin panel's own login was broken in the sheet's run.
+- **TC-STU-109 / TC-STU-110** (marketing-site "View Packages" → "Start Now") — the precondition is the public marketing site (`www.e2language.com`), a documented **production** host this suite is barred from targeting (see Environment below).
+
+Two pairs of the 22 were found to be near-duplicates under current app behavior and were each collapsed into a single spec: TC-STU-075/076 (both blocked by the same broken Study Pathway links) and TC-STU-097/104 (both blocked by the same non-expanding Assessments accordion).
 
 ## Environment
 
@@ -103,6 +142,14 @@ These are live-site behaviors this suite caught, distinct from failures in the t
 - **Registration auto-login ≠ a full SSO session**: right after registering, the browser can reach `Student/Home` but does **not** hold a full Azure B2C SSO session — navigating straight to the Teacher host forces a fresh login prompt instead of a silent SSO redirect. The login/session-scope specs explicitly re-authenticate through the real login form to get a comparable session to what a real user browsing normally would have.
 - Blocked email domains (`mailinator.net`, `mailinator2.com`) are rejected via a modal (`#errorDialogPane`) shown only on final form submit, not inline validation on the email field — the email input's own CSS class stays `valid` throughout.
 - **TC-STU-072's documented microphone blocker doesn't apply here**: the sheet's manual run couldn't complete the Score Calculator's Speaking/Read-Aloud questions because that environment had no microphone. Launching Chromium with `--use-fake-ui-for-media-stream --use-fake-device-for-media-stream` plus granting the `microphone`/`camera` permission (see `playwright.config.ts`) makes the RECORD/STOP widget's `MediaRecorder` produce real (silent) audio, which the app accepts — so this suite completes the full flow, including Speaking, end to end.
+- **TC-STU-043 (Free→Power upgrade)**: the sheet's own Actual Result already found this discrepancy — Power never appears in a Free student's upgrade list at all. This suite's spec asserts that confirmed-live current behavior rather than the sheet's documented Expected Result, pending engineering confirming which one is actually correct.
+- **Course Materials / Study Pathway / Assessments practice-and-submission entry points are broadly non-functional** (`tests/online-classes/writing-practice.spec.ts`, `tests/dashboard/study-pathway-unlock.spec.ts`, `tests/assessments/writing-speaking-assessments.spec.ts` — all in the non-blocking `playwright-known-issues` CI job): confirmed live and reproducible across three separate areas of the app for a freshly-upgraded PTE account —
+  - `/Student/ExamPreparation`'s "Writing" tab never leaves its loading spinner; network tracing shows the `SubModuleContent` AJAX call never fires on tab-click at all.
+  - The dashboard's Study Pathway widget renders a full, real practice-item tree, but clicking any leaf item (even with full parent-accordion expansion and human-like mouse-moved clicks) never populates the widget's own activity dialog iframe.
+  - `/Student/Assessment`'s Writing/Speaking accordion groups never expand on click (`aria-expanded` stays `false`), so no assessment row is ever reachable to submit.
+
+  This is the same class of defect as `TC-E2E-003`'s broken "Write Email" launch — these three specs are written to assert the *correct* expected behavior per the sheet (same treatment as the TC-STU-011 PayPal case above), so they are expected to fail until fixed.
+- **TC-STU-056 (password reset via emailed OTP)**: the request → Mailinator retrieval → code-verification flow is implemented and does work (confirmed live), but real-world Mailinator delivery/read timing was inconsistent enough during verification (anywhere from ~30s to no delivery within 4 minutes) that this spec lives in the non-blocking `playwright-known-issues` job rather than the main gate. Scope is also intentionally partial — it covers through OTP verification succeeding, not the subsequent "set new password" step, which only renders after a `Continue` submission whose resulting page wasn't reliably reproducible during exploration.
 
 ## Extending this suite
 

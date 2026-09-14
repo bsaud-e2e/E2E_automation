@@ -18,8 +18,16 @@ permissions:
 # consistently time out on page.waitForURL from GitHub-hosted runners'
 # cloud IPs (see the "payment" job below). Keep this list in sync with
 # tests/**/*.spec.ts if a spec starts/stops completing a real payment.
+#
+# Specs that are expected to currently fail against the live app - either a
+# confirmed, reproducible application defect (broken practice/assessment
+# launch entry points - see the README's "Known findings") or a flaky
+# external dependency (Mailinator email delivery timing for TC-STU-056) -
+# run in their own non-blocking job so a real regression elsewhere still
+# fails the build, but these known conditions don't.
 env:
-  PAYMENT_SPECS_GREP: 'TC-STU-020:|TC-STU-011:|TC-STU-036:|TC-STU-027:|TC-STU-028:'
+  PAYMENT_SPECS_GREP: 'TC-STU-020:|TC-STU-011:|TC-STU-036:|TC-STU-027:|TC-STU-028:|TC-STU-013:'
+  KNOWN_ISSUES_SPECS_GREP: 'TC-STU-065 / TC-STU-066:|TC-STU-075 / TC-STU-076:|TC-STU-097 / TC-STU-104:|TC-STU-056:'
 
 jobs:
   playwright:
@@ -45,8 +53,8 @@ jobs:
       - name: Install Playwright's Chromium browser
         run: npx playwright install --with-deps chromium
 
-      - name: Run E2E suite (excluding payment-completing specs)
-        run: npx playwright test --grep-invert "$PAYMENT_SPECS_GREP"
+      - name: Run E2E suite (excluding payment-completing and known-issue specs)
+        run: npx playwright test --grep-invert "$PAYMENT_SPECS_GREP|$KNOWN_ISSUES_SPECS_GREP"
 
       - name: QA Agent - analyze results and report
         if: always()
@@ -120,5 +128,58 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: test-results-payment
+          path: test-results/
+          retention-days: 14
+
+  playwright-known-issues:
+    name: Run known-issue specs (non-blocking)
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # These specs assert the CORRECT/expected app behavior per the Excel
+    # test-case sheet, and are known to currently fail - either a confirmed,
+    # reproducible application defect (see README "Known findings") or
+    # Mailinator email-delivery timing. Kept running (not deleted) so a real
+    # regression, or the day the underlying defect is fixed, is still
+    # visible - but never blocks the build.
+    continue-on-error: true
+    steps:
+      - name: Check out repo
+        uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install Playwright's Chromium browser
+        run: npx playwright install --with-deps chromium
+
+      - name: Run known-issue E2E specs
+        run: npx playwright test --grep "$KNOWN_ISSUES_SPECS_GREP"
+
+      - name: QA Agent - analyze results and report
+        if: always()
+        env:
+          DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: node scripts/qa-report.js
+
+      - name: Upload Playwright HTML report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: playwright-report-known-issues
+          path: playwright-report/
+          retention-days: 14
+
+      - name: Upload traces/videos for failed tests
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: test-results-known-issues
           path: test-results/
           retention-days: 14
