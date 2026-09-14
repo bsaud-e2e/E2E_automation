@@ -9,11 +9,13 @@ npm install
 npx playwright install chromium
 ```
 
-Copy `.env.example` to `.env` if you need to override any host:
+Copy `.env.example` to `.env` and fill in credentials (staging fixture-account emails/passwords, plus the password this suite uses for accounts it registers itself) — `.env` is gitignored, so this is the one place real credentials should live, never in source:
 
 ```bash
 cp .env.example .env
 ```
+
+Every credential has a fallback in `test-data/registrationData.ts` so the suite still runs with `.env` left blank, but keep `.env` as the source of truth going forward rather than editing values in source. `.env.example` documents every variable.
 
 ## Running the suite
 

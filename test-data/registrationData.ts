@@ -27,7 +27,11 @@ export const PAID_PACKAGE = {
   packageCode: 'PTE_PaidV2_1',
 };
 
-export const DEFAULT_PASSWORD = 'TestPass123!';
+// All credentials below are sourced from process.env (see .env.example) so
+// they live in one gitignored place rather than in source. Each falls back
+// to its last-known-working value so the suite still runs if .env is left
+// unfilled, but .env is where they should be kept up to date going forward.
+export const DEFAULT_PASSWORD = process.env.DEFAULT_STUDENT_PASSWORD || 'TestPass123!';
 
 // TC-STU-007's own test data: "confirmed-safe @mailinator.com domain".
 export const ALLOWED_EMAIL_DOMAIN = 'mailinator.com';
@@ -56,9 +60,24 @@ export const PAYMENT_GATEWAY_HOST = 'https://e2-staging-store.myshopify.com';
  * one-time-offer fixtures as already spent unless re-verified live.
  */
 export const FIXTURE_ACCOUNTS = {
-  powerTier: { email: 'e2e.stu.power.260908@mailinator.com', password: 'TestPass123!' },
-  showtimeTier: { email: 'e2e.stu.showtime.260908@mailinator.com', password: 'TestPass123!' },
-  expressExtraTier: { email: 'e2e.stu.expressextra.260908@mailinator.com', password: 'TestPass123!' },
-  expiredFreeTrial: { email: 'test_ptefree28@mailinator.com', password: 'Temp@1234' },
-  paidForExtension: { email: 'demo-selfgraded4@mailinator.com', password: 'Temp@1234' },
+  powerTier: {
+    email: process.env.FIXTURE_POWER_TIER_EMAIL || 'e2e.stu.power.260908@mailinator.com',
+    password: process.env.FIXTURE_POWER_TIER_PASSWORD || 'TestPass123!',
+  },
+  showtimeTier: {
+    email: process.env.FIXTURE_SHOWTIME_TIER_EMAIL || 'e2e.stu.showtime.260908@mailinator.com',
+    password: process.env.FIXTURE_SHOWTIME_TIER_PASSWORD || 'TestPass123!',
+  },
+  expressExtraTier: {
+    email: process.env.FIXTURE_EXPRESS_EXTRA_TIER_EMAIL || 'e2e.stu.expressextra.260908@mailinator.com',
+    password: process.env.FIXTURE_EXPRESS_EXTRA_TIER_PASSWORD || 'TestPass123!',
+  },
+  expiredFreeTrial: {
+    email: process.env.FIXTURE_EXPIRED_FREE_TRIAL_EMAIL || 'test_ptefree28@mailinator.com',
+    password: process.env.FIXTURE_EXPIRED_FREE_TRIAL_PASSWORD || 'Temp@1234',
+  },
+  paidForExtension: {
+    email: process.env.FIXTURE_PAID_FOR_EXTENSION_EMAIL || 'demo-selfgraded4@mailinator.com',
+    password: process.env.FIXTURE_PAID_FOR_EXTENSION_PASSWORD || 'Temp@1234',
+  },
 };
