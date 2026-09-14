@@ -52,7 +52,11 @@ export class ShopifyCheckoutPage extends BasePage {
 
   constructor(page: Page) {
     super(page);
-    this.creditCardOption = page.getByText(/pay with credit card/i).first();
+    // Confirmed live: this reads "Pay with Credit card" while the payment
+    // method accordion is still collapsed, but just "Credit card" once it's
+    // already auto-expanded (the only option, so Shopify expands it
+    // immediately) - which one is visible depends on timing, so match both.
+    this.creditCardOption = page.getByText(/credit card/i).first();
     this.paypalOption = page.getByText('PayPal', { exact: true }).first();
     this.firstNameInput = page.locator('input[name="firstName"]').first();
     this.lastNameInput = page.locator('input[name="lastName"]').first();
