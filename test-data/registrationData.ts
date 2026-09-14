@@ -27,9 +27,12 @@ export const PAID_PACKAGE = {
   packageCode: 'PTE_PaidV2_1',
 };
 
-// All credentials below are sourced from process.env (see .env.example) so
-// they live in one gitignored place rather than in source. Each falls back
-// to its last-known-working value so the suite still runs if .env is left
+// All credentials below are sourced from process.env (see .env.example,
+// which splits them into two kinds - REUSED fixture accounts below, and
+// this one, GENERATED PER RUN: not a fixed account, just the password
+// template every freshly-registered account in this suite uses) so they
+// live in one gitignored place rather than in source. Each falls back to
+// its last-known-working value so the suite still runs if .env is left
 // unfilled, but .env is where they should be kept up to date going forward.
 export const DEFAULT_PASSWORD = process.env.DEFAULT_STUDENT_PASSWORD || 'TestPass123!';
 
@@ -49,38 +52,51 @@ export const TEST_CARDS = {
 export const PAYMENT_GATEWAY_HOST = 'https://e2-staging-store.myshopify.com';
 
 /**
- * Shared, pre-existing fixture accounts from the "Credentials & Test Data"
- * / individual test cases' own Test Data fields - not created by this
- * suite, and their state is mutated by using them (a package tier, a
- * one-time promo claim, an extension). Confirmed live 2026-09-10 that all
- * three tier accounts below still authenticate; the "no-arg" package-upgrade
- * cases (047/049/052) only read state (which upgrade tiers are offered) so
- * are safe to reuse across runs, but expiredFreeTrial's extend-trial survey
- * is one-time-per-account - treat it as spent once TC-STU-018 has run
- * against it (TC-STU-017 detects this and skips rather than faking a
- * result - see tests/dashboard/extend-trial-survey.spec.ts). The original
- * test_ptefree28@mailinator.com had already used its one survey; a fresh
- * expired-free (not expired-paid - tdse2-dpaid-5@mailinator.com was tried
- * and turned out to be a paid Express account, confirmed live) account
- * should replace the default below once the current one is spent too.
+ * REUSED fixture accounts (see .env.example's "1. REUSED" section) -
+ * shared, pre-existing accounts from the "Credentials & Test Data" sheet /
+ * individual test cases' own Test Data fields, not created by this suite.
+ * Their state is mutated by using them, at different paces per account -
+ * see the per-key comments below for exactly which TC ID(s) use each one
+ * and what "needs refreshing" looks like for it. Contrast with
+ * DEFAULT_PASSWORD above: everything NOT listed here registers its own
+ * fresh, uniquely-emailed account on every run instead of reusing one.
  */
 export const FIXTURE_ACCOUNTS = {
+  // TC-STU-047 (Power -> Silver upgrade allowed). Also logged into by
+  // TC-STU-036, 065/066, 069, 075/076, 081/091/092/093, 097/104 - all
+  // read-only or hitting a confirmed-broken entry point, so only
+  // TC-STU-069 (marks a class "Watched") mutates real state here.
   powerTier: {
     email: process.env.FIXTURE_POWER_TIER_EMAIL || 'e2e.stu.power.260908@mailinator.com',
     password: process.env.FIXTURE_POWER_TIER_PASSWORD || 'TestPass123!',
   },
+  // TC-STU-049 (Showtime -> Gold upgrade allowed). Read-only - safe indefinitely.
   showtimeTier: {
     email: process.env.FIXTURE_SHOWTIME_TIER_EMAIL || 'e2e.stu.showtime.260908@mailinator.com',
     password: process.env.FIXTURE_SHOWTIME_TIER_PASSWORD || 'TestPass123!',
   },
+  // TC-STU-052 (Express Extra -> Silver upgrade allowed). Read-only - safe indefinitely.
   expressExtraTier: {
     email: process.env.FIXTURE_EXPRESS_EXTRA_TIER_EMAIL || 'e2e.stu.expressextra.260908@mailinator.com',
     password: process.env.FIXTURE_EXPRESS_EXTRA_TIER_PASSWORD || 'TestPass123!',
   },
+  // TC-STU-017 / TC-STU-018 (expired-free-trial "Extend Trial" survey) -
+  // one-time-per-account: once either test completes the survey, the
+  // modal stops appearing for this account at all (TC-STU-017 detects
+  // this and skips rather than faking a result). Needs a FREE-tier
+  // expired account specifically - a paid-tier expired account (e.g.
+  // tdse2-dpaid-5@mailinator.com, tried and confirmed live to be an
+  // expired paid Express account) shows a different modal entirely and
+  // won't work here.
   expiredFreeTrial: {
     email: process.env.FIXTURE_EXPIRED_FREE_TRIAL_EMAIL || 'student-pte-123@mailinator.com',
     password: process.env.FIXTURE_EXPIRED_FREE_TRIAL_PASSWORD || 'Temp@1234',
   },
+  // TC-STU-020 (paid package extension) - self-consuming: a passing run
+  // makes a real 1-week extension purchase, pushing this account's expiry
+  // out by that much. It naturally becomes "expired" and testable again
+  // once that time elapses; no swap needed unless you want it passing
+  // sooner. Confirmed live 2026-09-14: "2 days remaining" (not expired).
   paidForExtension: {
     email: process.env.FIXTURE_PAID_FOR_EXTENSION_EMAIL || 'demo-selfgraded4@mailinator.com',
     password: process.env.FIXTURE_PAID_FOR_EXTENSION_PASSWORD || 'Temp@1234',

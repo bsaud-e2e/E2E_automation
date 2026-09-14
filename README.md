@@ -15,7 +15,10 @@ Copy `.env.example` to `.env` and fill in credentials (staging fixture-account e
 cp .env.example .env
 ```
 
-Every credential has a fallback in `test-data/registrationData.ts` so the suite still runs with `.env` left blank, but keep `.env` as the source of truth going forward rather than editing values in source. `.env.example` documents every variable.
+Every credential has a fallback in `test-data/registrationData.ts` so the suite still runs with `.env` left blank, but keep `.env` as the source of truth going forward rather than editing values in source. `.env.example` documents every variable, split into two kinds:
+
+1. **Reused fixture accounts** — pre-existing staging accounts shared across specific specs (`FIXTURE_POWER_TIER_*`, `FIXTURE_SHOWTIME_TIER_*`, `FIXTURE_EXPRESS_EXTRA_TIER_*`, `FIXTURE_EXPIRED_FREE_TRIAL_*`, `FIXTURE_PAID_FOR_EXTENSION_*`). Each one's own tests mutate its state at a different pace — `.env.example` and `test-data/registrationData.ts` document exactly which TC ID(s) use which account and what "needs refreshing" looks like for it.
+2. **Generated per run** — `DEFAULT_STUDENT_PASSWORD` isn't a fixed account at all; it's the password template every other test uses when it registers its own fresh, uniquely-emailed account, which covers the large majority of TC IDs.
 
 ## Running the suite
 
