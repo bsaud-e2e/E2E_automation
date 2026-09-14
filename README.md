@@ -143,7 +143,7 @@ TC IDs below are the final `Stage_TestCase_E2E.xlsx` numbering. Where a spec's I
 
 Plus supplementary specs, none tied to a TC ID in the final sheet:
 - Free-trial registration happy path and field validation (`tests/registration/free-registration.spec.ts`) and a duplicate-email registration check (`tests/registration/registration-negative.spec.ts`).
-- TC-STU-081/091/092/093 (`tests/dashboard/study-pathway-widget.spec.ts`) — gap-analysis additions from an earlier draft sheet that were cut from the final 74-case list. Kept as bonus dashboard coverage pending a keep/remove decision.
+- TC-STU-081/091/092/093 (`tests/dashboard/study-pathway-widget.spec.ts`) — gap-analysis additions from an earlier draft sheet, not present in the final 74-case list. Kept deliberately: they check UI rendering (does the Score Calculator menu item show for both tiers, does the Study Pathway widget load its panels/labels/percentages, does the Info Modal open and close cleanly) that no case in the final sheet covers at that granularity - not a duplicate of anything in it.
 
 ### Smoke-case gap analysis (2026-09-14)
 
