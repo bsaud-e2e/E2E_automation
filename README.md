@@ -77,7 +77,7 @@ tests/
   fixtures.ts                custom test/expect wrapper (see "Bot detection" below)
   registration/               free & paid registration, negative paths, payment method visibility
   login/                        login, logout, session scope
-  account-security/              password reset (request, no-leak check, full OTP completion)
+  account-security/              password reset (request, no-leak check, full OTP completion, My Account change-password dialog)
   dashboard/                       Study Pathway widget, extend-trial survey
   upgrades/                          free/paid upgrades, package allow-list, switch course
   score-calculator/                   System Requirement Checker through to the score report
@@ -114,7 +114,7 @@ tests/
 | TC-STU-075 / 076 | Study Pathway practice item opens (known-issue — app defect) | `tests/dashboard/study-pathway-unlock.spec.ts` |
 | TC-STU-097 / 104 | Assessments-menu Writing/Speaking submission (known-issue — app defect) | `tests/assessments/writing-speaking-assessments.spec.ts` |
 
-Plus supporting specs not tied to a single TC ID: free-trial registration happy path and field validation (`tests/registration/free-registration.spec.ts`), and a duplicate-email registration check (`tests/registration/registration-negative.spec.ts`).
+Plus supporting specs not tied to a single TC ID: free-trial registration happy path and field validation (`tests/registration/free-registration.spec.ts`), a duplicate-email registration check (`tests/registration/registration-negative.spec.ts`), and the My Account Change Password dialog reachability check (`tests/account-security/change-password-modal.spec.ts` — see "Known findings" for why it stops short of a full submit).
 
 ### Smoke-case gap analysis (2026-09-14)
 
@@ -152,7 +152,7 @@ These are live-site behaviors this suite caught, distinct from failures in the t
 
   This is the same class of defect as `TC-E2E-003`'s broken "Write Email" launch — these three specs are written to assert the *correct* expected behavior per the sheet (same treatment as the TC-STU-011 PayPal case above), so they are expected to fail until fixed.
 - **TC-STU-056 (password reset via emailed OTP)**: the request → Mailinator retrieval → code-verification flow is implemented and does work (confirmed live), but real-world Mailinator delivery/read timing was inconsistent enough during verification (anywhere from ~30s to no delivery within 4 minutes) that this spec lives in the non-blocking `playwright-known-issues` job rather than the main gate. Scope is also intentionally partial — it covers through OTP verification succeeding, not the subsequent "set new password" step, which only renders after a `Continue` submission whose resulting page wasn't reliably reproducible during exploration. Success for both the "send code" and "verify code" steps is checked by intercepting the actual B2C API call each one makes (`SelfAsserted/DisplayControlAction`) and asserting its JSON body's own `status` field is `"200"`, rather than scraping UI text or button visibility as a proxy — confirmed live this endpoint always answers HTTP 200 at the transport layer even when the code is wrong, so the body is the real signal.
-- **A separate, CAPTCHA-gated password-change flow exists** at `/Student/MyAccount/ResetPassword` (My Account → Account Settings → Reset Password, while logged in) — distinct from TC-STU-056's logged-out "Forgot Password" flow. It's gated by a real Google reCAPTCHA v2 checkbox that, confirmed live, does not auto-pass for this suite's automated browser (it surfaces a genuine image-solve challenge). Left unautomated rather than attempting to defeat a real bot-prevention control.
+- **A separate, CAPTCHA-gated password-change flow exists** at `/Student/MyAccount/ResetPassword` (My Account → Account Settings → Reset Password, while logged in) — distinct from TC-STU-056's logged-out "Forgot Password" flow. Its submission is gated by a real Google reCAPTCHA v2 checkbox that, confirmed live, does not auto-pass for this suite's automated browser (it surfaces a genuine image-solve challenge), so `tests/account-security/change-password-modal.spec.ts` only covers what's automatable without defeating a real bot-prevention control: clicking Reset Password displays the Change Password dialog with its New Password / Confirm Password fields, reCAPTCHA widget, and Reset/Cancel actions all present.
 
 ## Extending this suite
 

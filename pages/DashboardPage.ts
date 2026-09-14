@@ -14,6 +14,7 @@ export class DashboardPage extends BasePage {
   readonly upgradeLink: Locator;
   readonly switchCourseLink: Locator;
   readonly shopNavItem: Locator;
+  readonly myAccountLink: Locator;
 
   constructor(page: Page) {
     super(page);
@@ -25,6 +26,7 @@ export class DashboardPage extends BasePage {
     this.upgradeLink = page.locator('a.upgrade-account-menu').first();
     this.switchCourseLink = page.locator('li:has(#logout) a', { hasText: 'Switch My Course' });
     this.shopNavItem = page.locator('#e2shop-menu');
+    this.myAccountLink = page.locator('a.my-account-menu');
   }
 
   async gotoHome(): Promise<void> {
@@ -64,5 +66,11 @@ export class DashboardPage extends BasePage {
 
   async goToShop(): Promise<void> {
     await this.humanClick(this.shopNavItem);
+  }
+
+  async goToMyAccount(): Promise<void> {
+    await this.humanClick(this.profileMenuToggle);
+    await this.myAccountLink.waitFor({ state: 'visible', timeout: 10_000 });
+    await this.humanClick(this.myAccountLink);
   }
 }
