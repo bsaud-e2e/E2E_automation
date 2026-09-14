@@ -27,15 +27,22 @@ export class ForgotPasswordPage extends BasePage {
   }
 
   /**
-   * B2C's SelfAsserted/DisplayControlAction endpoint backs both "Send
-   * verification code" and "Verify code" - confirmed live via network
-   * capture. It always answers HTTP 200 at the transport layer (even for a
+   * "Send verification code" and "Verify code" each hit their own distinct
+   * action under B2C's SelfAsserted/DisplayControlAction endpoint -
+   * confirmed live via network capture:
+   *   .../DisplayControlAction/vbeta/emailVerificationControl/SendCode
+   *   .../DisplayControlAction/vbeta/emailVerificationControl/VerifyCode
+   * Both always answer HTTP 200 at the transport layer (even for a
    * rejected/wrong code); the real result is the JSON body's own "status"
    * field (e.g. "200" on success), so that's what callers should check
    * rather than the HTTP status alone.
    */
-  private waitForDisplayControlAction() {
-    return this.page.waitForResponse((res) => res.url().includes('SelfAsserted/DisplayControlAction'));
+  private waitForSendCodeAction() {
+    return this.page.waitForResponse((res) => res.url().includes('emailVerificationControl/SendCode'));
+  }
+
+  private waitForVerifyCodeAction() {
+    return this.page.waitForResponse((res) => res.url().includes('emailVerificationControl/VerifyCode'));
   }
 
   async requestReset(email: string): Promise<void> {
@@ -44,9 +51,9 @@ export class ForgotPasswordPage extends BasePage {
     await this.humanClick(this.sendCodeButton);
   }
 
-  /** Same as requestReset(), but resolves with the send-code API call's parsed JSON body. */
+  /** Same as requestReset(), but resolves with the SendCode API call's parsed JSON body. */
   async requestResetAndGetApiResult(email: string): Promise<{ status: string }> {
-    const responsePromise = this.waitForDisplayControlAction();
+    const responsePromise = this.waitForSendCodeAction();
     await this.requestReset(email);
     const response = await responsePromise;
     return response.json();
@@ -67,9 +74,9 @@ export class ForgotPasswordPage extends BasePage {
     await this.humanClick(this.verifyCodeButton);
   }
 
-  /** Same as enterAndVerifyCode(), but resolves with the verify-code API call's parsed JSON body. */
+  /** Same as enterAndVerifyCode(), but resolves with the VerifyCode API call's parsed JSON body. */
   async enterAndVerifyCodeGetApiResult(code: string): Promise<{ status: string }> {
-    const responsePromise = this.waitForDisplayControlAction();
+    const responsePromise = this.waitForVerifyCodeAction();
     await this.enterAndVerifyCode(code);
     const response = await responsePromise;
     return response.json();
