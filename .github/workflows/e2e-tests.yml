@@ -25,9 +25,14 @@ permissions:
 # external dependency (Mailinator email delivery timing for TC-STU-056) -
 # run in their own non-blocking job so a real regression elsewhere still
 # fails the build, but these known conditions don't.
+# TC IDs below follow Stage_TestCase_E2E (final) numbering. Several specs
+# were renumbered from an earlier draft sheet when it was finalized:
+# TC-STU-065/066 -> 060/061, TC-STU-069 -> 064, TC-STU-072 -> 067,
+# TC-STU-075/076 -> 070/071, TC-STU-097/104 -> retired, folded into
+# TC-E2E-053 (was TC-E2E-003). Keep these greps in sync with test titles.
 env:
   PAYMENT_SPECS_GREP: 'TC-STU-020:|TC-STU-011:|TC-STU-036:|TC-STU-027:|TC-STU-028:|TC-STU-013:'
-  KNOWN_ISSUES_SPECS_GREP: 'TC-STU-065 / TC-STU-066:|TC-STU-075 / TC-STU-076:|TC-STU-097 / TC-STU-104:|TC-STU-056:'
+  KNOWN_ISSUES_SPECS_GREP: 'TC-STU-060 / TC-STU-061:|TC-STU-070 / TC-STU-071:|TC-E2E-053:|TC-STU-056:'
 
 jobs:
   playwright:

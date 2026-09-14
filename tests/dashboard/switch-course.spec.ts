@@ -5,7 +5,7 @@ import { createOnboardedStudent } from '../../utils/testUser';
 
 // Reference: Student sheet, TC-STU-012 "Free student switches course at no cost".
 test.describe('Switch Course', () => {
-  test('TC-STU-012: Free student switches course at no cost', async ({ page }) => {
+  test('TC-STU-012: Free student switches course at no cost', { tag: '@smoke' }, async ({ page }) => {
     await createOnboardedStudent(page, 'e2e.stu.switch');
     const dashboardPage = new DashboardPage(page);
     await dashboardPage.dismissInfoModalIfPresent();

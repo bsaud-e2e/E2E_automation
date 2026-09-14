@@ -3,15 +3,17 @@ import { DashboardPage } from '../../pages/DashboardPage';
 import { MyAccountPage } from '../../pages/MyAccountPage';
 import { createOnboardedStudent } from '../../utils/testUser';
 
-// My Account > Account Settings > Reset Password (while logged in) - a
-// separate, CAPTCHA-gated flow from the Forgot Password/OTP flow covered by
-// TC-STU-056. Its submission can't be automated (see README "Known
-// findings" - a real Google reCAPTCHA blocks it), so this only covers what
-// is automatable: clicking Reset Password displays the Change Password
-// dialog with its New Password / Confirm Password fields, reCAPTCHA, and
-// Reset/Cancel actions - not the full submit flow.
+// Reference: Student sheet (Stage_TestCase_E2E, final), TC-STU-058
+// (Regression) "Change password while logged in" - My Account > Account
+// Settings > Reset Password, a separate, CAPTCHA-gated flow from the
+// Forgot Password/OTP flow covered by TC-STU-056. Its submission can't be
+// automated (see README "Known findings" - a real Google reCAPTCHA blocks
+// it), so this only covers what is automatable: clicking Reset Password
+// displays the Change Password dialog with its New Password / Confirm
+// Password fields, reCAPTCHA, and Reset/Cancel actions - not the full
+// submit flow.
 test.describe('Change Password Modal', () => {
-  test('Clicking Reset Password under My Account displays the Change Password dialog', async ({ page }) => {
+  test('TC-STU-058: Clicking Reset Password under My Account displays the Change Password dialog', { tag: '@regression' }, async ({ page }) => {
     test.setTimeout(60_000);
     await createOnboardedStudent(page, 'e2e.stu.changepw');
 

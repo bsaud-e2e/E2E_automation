@@ -5,7 +5,7 @@ import { STUDENT_APP_HOST } from '../../test-data/registrationData';
 
 // Reference: Student sheet, TC-STU-003 "Student logs out successfully".
 test.describe('Student Logout', () => {
-  test('TC-STU-003: Logging out ends the session and blocks direct dashboard access', async ({ page }) => {
+  test('TC-STU-003: Logging out ends the session and blocks direct dashboard access', { tag: '@smoke' }, async ({ page }) => {
     await createOnboardedStudent(page, 'e2e.stu.logout');
 
     const dashboardPage = new DashboardPage(page);

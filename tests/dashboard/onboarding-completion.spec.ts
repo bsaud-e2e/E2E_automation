@@ -4,7 +4,7 @@ import { createOnboardedStudent } from '../../utils/testUser';
 
 // Reference: Student sheet, TC-STU-006 "New student completes onboarding".
 test.describe('New Student Onboarding', () => {
-  test('TC-STU-006: A new free student completes onboarding and sees their dashboard summary', async ({
+  test('TC-STU-006: A new free student completes onboarding and sees their dashboard summary', { tag: '@smoke' }, async ({
     page,
   }) => {
     await createOnboardedStudent(page, 'e2e.stu.onboard');

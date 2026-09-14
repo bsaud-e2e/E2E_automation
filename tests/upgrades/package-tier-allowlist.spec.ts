@@ -8,7 +8,7 @@ import { FIXTURE_ACCOUNTS } from '../../test-data/registrationData';
 // at each tier (see FIXTURE_ACCOUNTS) rather than building each tier from
 // scratch through a chain of real payments.
 test.describe('Package Upgrade Allow-list', () => {
-  test('TC-STU-047: Power package upgrade to Silver is allowed', async ({ page }) => {
+  test('TC-STU-047: Power package upgrade to Silver is allowed', { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();
     await loginPage.loginAndWaitForRedirect(FIXTURE_ACCOUNTS.powerTier.email, FIXTURE_ACCOUNTS.powerTier.password);
@@ -19,7 +19,7 @@ test.describe('Package Upgrade Allow-list', () => {
     await expect(upgradeAccountPage.packageCard('silver')).toBeVisible({ timeout: 20_000 });
   });
 
-  test('TC-STU-049: Showtime package upgrade to Gold is allowed', async ({ page }) => {
+  test('TC-STU-049: Showtime package upgrade to Gold is allowed', { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();
     await loginPage.loginAndWaitForRedirect(
@@ -33,7 +33,7 @@ test.describe('Package Upgrade Allow-list', () => {
     await expect(upgradeAccountPage.packageCard('gold')).toBeVisible({ timeout: 20_000 });
   });
 
-  test('TC-STU-052: Express Extra package upgrade to Silver is allowed', async ({ page }) => {
+  test('TC-STU-052: Express Extra package upgrade to Silver is allowed', { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();
     await loginPage.loginAndWaitForRedirect(

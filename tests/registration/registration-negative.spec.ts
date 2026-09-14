@@ -6,7 +6,7 @@ import { BLOCKED_EMAIL_DOMAINS, ALLOWED_EMAIL_DOMAIN, DEFAULT_PASSWORD, EXAM_TYP
 // Reference: Student sheet, TC-STU-008 "Registration is blocked for disposable email domains".
 test.describe('Student Registration - Negative Paths', () => {
   for (const domain of BLOCKED_EMAIL_DOMAINS) {
-    test(`TC-STU-008: Registration is rejected for blocked domain @${domain}`, async ({ page }) => {
+    test(`TC-STU-008: Registration is rejected for blocked domain @${domain}`, { tag: '@regression' }, async ({ page }) => {
       const registrationPage = new RegistrationPage(page);
       const email = uniqueEmail('e2e.stu.blocked', domain);
 
@@ -29,7 +29,7 @@ test.describe('Student Registration - Negative Paths', () => {
     });
   }
 
-  test('TC-STU-008 (control): Registration proceeds for an allowed domain', async ({ page }) => {
+  test('TC-STU-008 (control): Registration proceeds for an allowed domain', { tag: '@regression' }, async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
     const email = uniqueEmail('e2e.stu.allowed', ALLOWED_EMAIL_DOMAIN);
 
@@ -40,7 +40,7 @@ test.describe('Student Registration - Negative Paths', () => {
     await expect(registrationPage.firstNameInput).toBeVisible();
   });
 
-  test('Registering with an already-used email offers to go to Login', async ({ page }) => {
+  test('Registering with an already-used email offers to go to Login', { tag: '@regression' }, async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
     const email = uniqueEmail('e2e.stu.duplicate', ALLOWED_EMAIL_DOMAIN);
 

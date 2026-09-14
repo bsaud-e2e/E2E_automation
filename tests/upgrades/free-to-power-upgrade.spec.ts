@@ -3,16 +3,17 @@ import { DashboardPage } from '../../pages/DashboardPage';
 import { UpgradeAccountPage } from '../../pages/UpgradeAccountPage';
 import { createOnboardedStudent } from '../../utils/testUser';
 
-// Reference: Student sheet, TC-STU-043 "Free student upgrading to Power is
-// allowed". The sheet's own Actual Result already found this to be a
-// discrepancy: Power never appears in a Free student's upgrade list at all
-// (only Bronze/Silver/Gold/Express etc.), contradicting the documented
-// Expected Result. This spec asserts the app's current, confirmed-live
+// Reference: Student sheet (Stage_TestCase_E2E, final), TC-STU-043 (Smoke)
+// "Free package upgrade to Power: ALLOWED". Still documented as allowed in
+// this final sheet, but confirmed live and reproducible: Power never
+// appears in a Free student's upgrade list at all (only Bronze/Silver/
+// Gold/Express etc.). This spec asserts the app's current, confirmed-live
 // behavior (Power NOT offered) rather than the sheet's expected text, the
 // same treatment as the known TC-STU-011 PayPal discrepancy - see the
-// README's "Known findings" section.
+// README's "Known findings" section. This remains an open discrepancy for
+// engineering to confirm which side (app or sheet) is wrong.
 test.describe('Free-to-Power Upgrade', () => {
-  test('TC-STU-043: Power package does not appear in a Free student\'s upgrade list', async ({ page }) => {
+  test('TC-STU-043: Power package does not appear in a Free student\'s upgrade list', { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(60_000);
     await createOnboardedStudent(page, 'e2e.stu.f2power');
     const dashboardPage = new DashboardPage(page);

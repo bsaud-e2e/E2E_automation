@@ -6,7 +6,7 @@ import { ALLOWED_EMAIL_DOMAIN, DEFAULT_PASSWORD, EXAM_TYPE_CODE } from '../../te
 // Reference: Student sheet, TC-STU-007 family / Dashboard & Environment URLs -
 // "Free registration entry point (confirmed live)".
 test.describe('Student Registration - Free Trial Sign Up', () => {
-  test('TC-STU-FREE-01: Student completes the Free Sign Up form with valid details', async ({ page }) => {
+  test('TC-STU-FREE-01: Student completes the Free Sign Up form with valid details', { tag: '@smoke' }, async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
     const email = uniqueEmail('e2e.stu.free', ALLOWED_EMAIL_DOMAIN);
 
@@ -28,7 +28,7 @@ test.describe('Student Registration - Free Trial Sign Up', () => {
     }).toPass({ timeout: 20_000 });
   });
 
-  test('TC-STU-FREE-02: Submitting step 1 without an email shows inline validation', async ({ page }) => {
+  test('TC-STU-FREE-02: Submitting step 1 without an email shows inline validation', { tag: '@regression' }, async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
 
     await registrationPage.gotoFreeRegistration(EXAM_TYPE_CODE);
@@ -39,7 +39,7 @@ test.describe('Student Registration - Free Trial Sign Up', () => {
     expect(await registrationPage.isEmailFieldFlaggedInvalid()).toBe(true);
   });
 
-  test('TC-STU-FREE-03: Submitting step 2 with an empty password is rejected', async ({ page }) => {
+  test('TC-STU-FREE-03: Submitting step 2 with an empty password is rejected', { tag: '@regression' }, async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
     const email = uniqueEmail('e2e.stu.free.nopass', ALLOWED_EMAIL_DOMAIN);
 

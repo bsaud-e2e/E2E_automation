@@ -12,7 +12,7 @@ import { TEST_CARDS } from '../../test-data/registrationData';
 // permanently mutate it for the other Upgrade specs that depend on its
 // current PTE package (see package-tier-allowlist.spec.ts).
 test.describe('Switch Course', () => {
-  test('TC-STU-013: Paid student switches course and pays the fee', async ({ page }) => {
+  test('TC-STU-013: Paid student switches course and pays the fee', { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(180_000);
 
     await createOnboardedStudent(page, 'e2e.stu.switchcourse');

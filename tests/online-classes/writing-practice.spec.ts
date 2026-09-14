@@ -3,19 +3,21 @@ import { LoginPage } from '../../pages/LoginPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 import { FIXTURE_ACCOUNTS, STUDENT_APP_HOST } from '../../test-data/registrationData';
 
-// Reference: Student sheet, TC-STU-065 "Student submits a Writing practice
-// activity" / TC-STU-066 "AI score report displays correctly". Confirmed
-// live (2026-09-14, PTE Power fixture account) that Course Materials'
-// "Writing" tab (/Student/ExamPreparation, module-2) never leaves its
-// "Loading..." placeholder - no SubModuleContent AJAX request fires on
-// tab-click at all, traced via page.on('response'). This is the same class
-// of broken content-launch defect as TC-E2E-003 and TC-STU-075/076 (below),
-// just in a different area of the app. Written to assert the CORRECT/
-// expected behavior per the sheet - same treatment as TC-STU-011 - so this
-// is EXPECTED TO FAIL until the underlying defect is fixed; see the
-// README's "Known findings".
+// Reference: Student sheet (Stage_TestCase_E2E, final), TC-STU-060 (Smoke)
+// "Submit a Writing Task 1 response for AI scoring" / TC-STU-061 (Smoke)
+// "View the AI-generated score report for Writing Task 1" - renumbered
+// from an earlier draft's TC-STU-065/066. Confirmed live (2026-09-14, PTE
+// Power fixture account) that Course Materials' "Writing" tab
+// (/Student/ExamPreparation, module-2) never leaves its "Loading..."
+// placeholder - no SubModuleContent AJAX request fires on tab-click at
+// all, traced via page.on('response'). This is the same class of broken
+// content-launch defect as TC-E2E-053 and TC-STU-070/071 (below), just in
+// a different area of the app. Written to assert the CORRECT/expected
+// behavior per the sheet - same treatment as TC-STU-011's earlier draft -
+// so this is EXPECTED TO FAIL until the underlying defect is fixed; see
+// the README's "Known findings".
 test.describe('Writing Practice Activity', () => {
-  test('TC-STU-065 / TC-STU-066: Writing practice activity opens, can be submitted, and shows an AI score report', async ({
+  test('TC-STU-060 / TC-STU-061: Writing practice activity opens, can be submitted, and shows an AI score report', { tag: '@smoke' }, async ({
     page,
   }) => {
     test.setTimeout(90_000);

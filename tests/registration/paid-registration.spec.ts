@@ -7,7 +7,7 @@ import { ALLOWED_EMAIL_DOMAIN, PAID_PACKAGE } from '../../test-data/registration
 // Canonical deep link from the Dashboard & Environment URLs sheet:
 // https://azdopl-rc-registrationapp.e2language.com/Registration/SignUp?examTypeCode=PTE&packageCode=PTE_PaidV2_1
 test.describe('Student Registration - Paid Sign Up', () => {
-  test('TC-STU-007: Student fills the paid registration form and reaches the Payment step', async ({ page }) => {
+  test('TC-STU-007: Student fills the paid registration form and reaches the Payment step', { tag: '@smoke' }, async ({ page }) => {
     const registrationPage = new RegistrationPage(page);
     const email = uniqueEmail('e2e.stu.paid', ALLOWED_EMAIL_DOMAIN);
 

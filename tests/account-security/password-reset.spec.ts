@@ -8,7 +8,7 @@ import { ALLOWED_EMAIL_DOMAIN } from '../../test-data/registrationData';
 
 // Reference: Student sheet, TC-STU-055 / TC-STU-057 (Account & Security - Password Reset).
 test.describe('Password Reset', () => {
-  test('TC-STU-055: Student requests a password reset and gets a verification code', async ({ page }) => {
+  test('TC-STU-055: Student requests a password reset and gets a verification code', { tag: '@smoke' }, async ({ page }) => {
     const { email } = await registerFreeStudent(page, 'e2e.stu.reset');
 
     const loginPage = new LoginPage(page);
@@ -22,7 +22,7 @@ test.describe('Password Reset', () => {
     }).toPass({ timeout: 15_000 });
   });
 
-  test('TC-STU-057: Password reset shows the same message for a registered and an unregistered email', async ({
+  test('TC-STU-057: Password reset shows the same message for a registered and an unregistered email', { tag: '@regression' }, async ({
     page,
   }) => {
     const { email: registeredEmail } = await registerFreeStudent(page, 'e2e.stu.reset.real');
@@ -70,7 +70,7 @@ test.describe('Password Reset', () => {
   // TC-STU-028, since the B2C policy's subsequent "set new password" step
   // only renders once Continue is submitted and wasn't reliably
   // reproducible during exploration.
-  test('TC-STU-056: Student receives and verifies the password-reset OTP by email', async ({ page, context }) => {
+  test('TC-STU-056: Student receives and verifies the password-reset OTP by email', { tag: '@smoke' }, async ({ page, context }) => {
     test.setTimeout(240_000);
     const { email } = await registerFreeStudent(page, 'e2e.stu.otpreset');
     const inboxName = email.split('@')[0];

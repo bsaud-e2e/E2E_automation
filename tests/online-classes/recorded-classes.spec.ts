@@ -4,7 +4,9 @@ import { DashboardPage } from '../../pages/DashboardPage';
 import { RecordedClassesPage } from '../../pages/RecordedClassesPage';
 import { FIXTURE_ACCOUNTS } from '../../test-data/registrationData';
 
-// Reference: Student sheet, TC-STU-069 "Paid student watches a recorded class".
+// Reference: Student sheet (Stage_TestCase_E2E, final), TC-STU-064 (Smoke)
+// "Paid user watches a recorded class in the Watched tab" - renumbered
+// from an earlier draft's TC-STU-069.
 //
 // Uses the sheet's own paid fixture account. Its recorded-class list is
 // small and finite - rather than hardcoding a title, this picks whichever
@@ -15,7 +17,7 @@ import { FIXTURE_ACCOUNTS } from '../../test-data/registrationData';
 // until either new recordings are added for this account or it points at a
 // different paid fixture.
 test.describe('Recorded Classes', () => {
-  test('TC-STU-069: Paid student plays a recorded class and it moves to Watched', async ({ page }) => {
+  test('TC-STU-064: Paid student plays a recorded class and it moves to Watched', { tag: '@smoke' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();
     await loginPage.loginAndWaitForRedirect(FIXTURE_ACCOUNTS.powerTier.email, FIXTURE_ACCOUNTS.powerTier.password);

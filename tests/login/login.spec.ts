@@ -6,7 +6,7 @@ import { STUDENT_APP_HOST } from '../../test-data/registrationData';
 
 // Reference: Student sheet, TC-STU-001 / TC-STU-002 (Login & Authentication).
 test.describe('Student Login', () => {
-  test('TC-STU-001: Student logs in with valid credentials and lands on the dashboard', async ({ page }) => {
+  test('TC-STU-001: Student logs in with valid credentials and lands on the dashboard', { tag: '@smoke' }, async ({ page }) => {
     // Registration's own auto-login isn't the login form under test, so a
     // fresh onboarded account is logged out first to exercise the real flow.
     const { email, password } = await createOnboardedStudent(page, 'e2e.stu.login');
@@ -23,7 +23,7 @@ test.describe('Student Login', () => {
     }).toPass({ timeout: 25_000 });
   });
 
-  test('TC-STU-002: Student login fails with wrong credentials', async ({ page }) => {
+  test('TC-STU-002: Student login fails with wrong credentials', { tag: '@regression' }, async ({ page }) => {
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();
     await loginPage.login('e2e.stu.invalid.login@mailinator.com', 'WrongPass!1');

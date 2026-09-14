@@ -6,7 +6,7 @@ import { LOGIN_HOST } from '../../test-data/registrationData';
 
 // Reference: Student sheet, TC-STU-004 "Student session is not lost when switching apps".
 test.describe('Student Session Scope', () => {
-  test('TC-STU-004: Navigating to the Teacher host never exposes Teacher content', async ({ page }) => {
+  test('TC-STU-004: Navigating to the Teacher host never exposes Teacher content', { tag: '@regression' }, async ({ page }) => {
     // This flow chains onboarding, a full re-login, and a cross-host B2C
     // redirect - each individually slow on this environment - so it needs
     // more room than the suite's default per-test timeout.

@@ -14,7 +14,7 @@ import { FIXTURE_ACCOUNTS } from '../../test-data/registrationData';
 // expired-trial modal is no longer offered on a later run at all. Both tests
 // skip gracefully (rather than faking a result) when that's the case.
 test.describe('Extend Trial Survey', () => {
-  test('TC-STU-018: Selecting Financial Constraint on the extend survey offers a 40% off voucher', async ({
+  test('TC-STU-018: Selecting Financial Constraint on the extend survey offers a 40% off voucher', { tag: '@smoke' }, async ({
     page,
   }) => {
     test.setTimeout(60_000);
@@ -36,7 +36,7 @@ test.describe('Extend Trial Survey', () => {
     await expect(page.getByText(/40% OFF/i)).toBeVisible();
   });
 
-  test('TC-STU-017: Completing the extend survey with a non-financial reason extends the trial by 1 week', async ({
+  test('TC-STU-017: Completing the extend survey with a non-financial reason extends the trial by 1 week', { tag: '@smoke' }, async ({
     page,
   }) => {
     test.setTimeout(60_000);

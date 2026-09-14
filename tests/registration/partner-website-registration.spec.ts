@@ -8,7 +8,7 @@ import { test, expect } from '../fixtures';
 // flow) - clicking "SIGN UP" there is what leads into the standard
 // Registration flow.
 test.describe('Partner Website Registration', () => {
-  test("TC-STU-035: Registering via a partner organization's voucher link reaches the standard sign-up flow", async ({
+  test("TC-STU-035: Registering via a partner organization's voucher link reaches the standard sign-up flow", { tag: '@smoke' }, async ({
     page,
   }) => {
     await page.goto('https://azdopl-rc-main.e2language.com/Registration/UpgradeAccountWithCode?code=GP001-bZbC-01', {

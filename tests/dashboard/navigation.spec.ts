@@ -7,7 +7,7 @@ import { createOnboardedStudent } from '../../utils/testUser';
 // Classes specifically - each is a click-to-expand submenu toggle rather
 // than a direct link, so "works" means its known submenu items appear.
 test.describe('Dashboard Navigation', () => {
-  test('TC-STU-005: Course Materials, Assessments and Online Classes menus open correctly', async ({ page }) => {
+  test('TC-STU-005: Course Materials, Assessments and Online Classes menus open correctly', { tag: '@smoke' }, async ({ page }) => {
     await createOnboardedStudent(page, 'e2e.stu.nav');
     const dashboardPage = new DashboardPage(page);
     await dashboardPage.dismissInfoModalIfPresent();

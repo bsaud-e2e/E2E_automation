@@ -13,7 +13,7 @@ import { FIXTURE_ACCOUNTS, TEST_CARDS } from '../../test-data/registrationData';
 // directly verifiable: the paid extension purchase completes successfully
 // and the "Access Period Expired" block clears.
 test.describe('Paid Package Extension', () => {
-  test('TC-STU-020: Paid student extends access by 1 week through standard checkout', async ({ page }) => {
+  test('TC-STU-020: Paid student extends access by 1 week through standard checkout', { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(120_000);
 
     const loginPage = new LoginPage(page);

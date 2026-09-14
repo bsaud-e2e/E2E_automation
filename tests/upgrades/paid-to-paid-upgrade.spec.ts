@@ -15,7 +15,7 @@ import { TEST_CARDS } from '../../test-data/registrationData';
 // onboarding, a live Shopify payment) into something too slow to be worth
 // the coverage here; left as a manual/future check.
 test.describe('Paid-to-Paid Upgrade', () => {
-  test('TC-STU-028: Paid student upgrading only sees strictly higher tiers', async ({ page }) => {
+  test('TC-STU-028: Paid student upgrading only sees strictly higher tiers', { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(150_000);
 
     await createOnboardedStudent(page, 'e2e.stu.p2p');

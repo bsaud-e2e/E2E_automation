@@ -7,7 +7,7 @@ import { TEST_CARDS } from '../../test-data/registrationData';
 
 // Reference: Student sheet, TC-STU-027 "Free student upgrading to paid pays full price".
 test.describe('Free-to-Paid Upgrade', () => {
-  test('TC-STU-027: Free student upgrading to Express pays the listed full price', async ({ page }) => {
+  test('TC-STU-027: Free student upgrading to Express pays the listed full price', { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(120_000);
     await createOnboardedStudent(page, 'e2e.stu.f2p');
     const dashboardPage = new DashboardPage(page);

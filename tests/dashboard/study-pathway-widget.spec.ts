@@ -5,15 +5,18 @@ import { StudyPathwayWidgetPage } from '../../pages/StudyPathwayWidgetPage';
 import { FIXTURE_ACCOUNTS } from '../../test-data/registrationData';
 import { createOnboardedStudent } from '../../utils/testUser';
 
-// Reference: Student sheet, TC-STU-081 / 091 / 092 / 093 - all gap-analysis
-// additions (source: QA_Test_Cases 1.xlsx) not yet executed against the live
-// app when the sheet was written. Confirmed live for a PTE account: the
-// widget renders one skill-category panel per module (Speaking/Writing/
-// Reading/Listening), not the sheet's assumed 5-row/8-button IELTS-style
-// layout - see StudyPathwayWidgetPage for the adaptation, the same kind of
-// environment-specific adjustment already documented for TC-STU-072.
+// SUPPLEMENTARY - not part of the final Stage_TestCase_E2E sheet's 74
+// Student-role cases (TC-STU-081/091/092/093 were gap-analysis additions
+// from an earlier draft sheet, source: QA_Test_Cases 1.xlsx, and were cut
+// from the final curated list). Kept as bonus dashboard coverage for now
+// pending a keep/remove decision - flag before relying on these IDs
+// anywhere else. Confirmed live for a PTE account: the widget renders one
+// skill-category panel per module (Speaking/Writing/Reading/Listening),
+// not the sheet's assumed 5-row/8-button IELTS-style layout - see
+// StudyPathwayWidgetPage for the adaptation, the same kind of
+// environment-specific adjustment already documented for TC-STU-067.
 test.describe('Score Calculator Menu Visibility', () => {
-  test('TC-STU-081: Score Calculator menu item is visible for both free and paid students', async ({ page }) => {
+  test('TC-STU-081 (supplementary, not in final sheet): Score Calculator menu item is visible for both free and paid students', { tag: '@regression' }, async ({ page }) => {
     test.setTimeout(60_000);
     await createOnboardedStudent(page, 'e2e.stu.sccheck.free');
     const dashboardPage = new DashboardPage(page);
@@ -31,8 +34,9 @@ test.describe('Score Calculator Menu Visibility', () => {
   });
 });
 
+// SUPPLEMENTARY - not part of the final sheet's 74 cases (see note above).
 test.describe('Study Pathway Widget', () => {
-  test('TC-STU-091: Study Pathway widget loads and renders its skill-category panels', async ({ page }) => {
+  test('TC-STU-091 (supplementary, not in final sheet): Study Pathway widget loads and renders its skill-category panels', { tag: '@regression' }, async ({ page }) => {
     test.setTimeout(60_000);
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();
@@ -47,7 +51,7 @@ test.describe('Study Pathway Widget', () => {
     expect(panelCount).toBeGreaterThan(0);
   });
 
-  test('TC-STU-092: Study Pathway lists skill tracks tagged Essential with a completion percentage', async ({
+  test('TC-STU-092 (supplementary, not in final sheet): Study Pathway lists skill tracks tagged Essential with a completion percentage', { tag: '@regression' }, async ({
     page,
   }) => {
     test.setTimeout(60_000);
@@ -72,7 +76,7 @@ test.describe('Study Pathway Widget', () => {
     expect(await widgetPage.skillCategoryHeaders().count()).toBe(4);
   });
 
-  test('TC-STU-093: The Study Pathway Info Modal opens and dismisses cleanly', async ({ page }) => {
+  test('TC-STU-093 (supplementary, not in final sheet): The Study Pathway Info Modal opens and dismisses cleanly', { tag: '@regression' }, async ({ page }) => {
     test.setTimeout(60_000);
     const loginPage = new LoginPage(page);
     await loginPage.gotoLogin();

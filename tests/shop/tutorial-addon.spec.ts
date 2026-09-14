@@ -10,7 +10,7 @@ import { FIXTURE_ACCOUNTS, TEST_CARDS } from '../../test-data/registrationData';
 // (a single 45-min 1:1 session, distinct from the "Tutorials - Bundle of
 // 2/3" cards) - confirmed live.
 test.describe('E2 Shop - Tutorial Add-on', () => {
-  test('TC-STU-036: Tutorial add-on can be bought twice with no purchase limit', async ({ page }) => {
+  test('TC-STU-036: Tutorial add-on can be bought twice with no purchase limit', { tag: '@smoke' }, async ({ page }) => {
     test.setTimeout(150_000);
 
     const loginPage = new LoginPage(page);

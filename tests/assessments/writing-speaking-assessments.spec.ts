@@ -3,23 +3,25 @@ import { LoginPage } from '../../pages/LoginPage';
 import { DashboardPage } from '../../pages/DashboardPage';
 import { FIXTURE_ACCOUNTS, STUDENT_APP_HOST } from '../../test-data/registrationData';
 
-// Reference: Student sheet, TC-STU-097 "Student submits an IELTS Speaking
-// Assessment for teacher marking" / TC-STU-104 "Submitting IELTS Writing
-// Task 1 via the Assessments menu marks it Submitted". The sheet's own
-// Actual Result for TC-STU-097 explicitly flags checking whether this hits
-// the same broken activity-launch defect as TC-E2E-003. Confirmed live
-// (2026-09-14, PTE Power fixture account): the Assessments page's Writing/
-// Speaking accordion groups never expand on click (aria-expanded stays
-// "false", height stays 0px - confirmed with a real mouse-moved click, not
-// just a plain one), so no assessment row is ever reachable. Written to
+// Reference: Student sheet (Stage_TestCase_E2E, final), TC-E2E-053 (Smoke)
+// "Submit a Writing/Speaking assessment for teacher grading (cross-role
+// leg 3 of 6)" - renumbered from an earlier draft's TC-E2E-003; that
+// draft's TC-STU-097/TC-STU-104 (IELTS-specific Speaking/Writing
+// submission via the Assessments menu) were retired as separate IDs in
+// this final sheet and folded into this one. Confirmed live (2026-09-14,
+// PTE Power fixture account): the Assessments page's Writing/Speaking
+// accordion groups never expand on click (aria-expanded stays "false",
+// height stays 0px - confirmed with a real mouse-moved click, not just a
+// plain one), so no assessment row is ever reachable - this is the same
+// broken activity-launch entry point TC-E2E-053 depends on. Written to
 // assert the CORRECT/expected behavior (an accordion group expands and
-// shows at least one assessment row) - same treatment as TC-STU-011 - so
-// this is EXPECTED TO FAIL until the defect is fixed; see the README's
-// "Known findings". Both TC IDs collapse into one test since they're
-// blocked by the identical broken entry point (the same accordion widget,
-// just a different tab/group).
+// shows at least one assessment row) - same treatment as TC-STU-011's
+// earlier draft - so this is EXPECTED TO FAIL until the defect is fixed;
+// see the README's "Known findings". This only covers the Student-side
+// entry point being reachable, not the full cross-role grading flow
+// (Teacher session out of scope for this Student-only suite).
 test.describe('Writing/Speaking Assessments', () => {
-  test('TC-STU-097 / TC-STU-104: An Assessments accordion group expands and shows a submittable row', async ({
+  test('TC-E2E-053: An Assessments accordion group expands and shows a submittable row', { tag: '@smoke' }, async ({
     page,
   }) => {
     test.setTimeout(60_000);
