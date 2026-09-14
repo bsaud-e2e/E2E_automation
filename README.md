@@ -53,6 +53,7 @@ pages/                    Page Object Model
   OnboardingWizardPage.ts      generic completion of the post-registration wizard
   ForgotPasswordPage.ts         B2C forgot-password flow
   PaymentPage.ts                  Payment Information page + Shopify checkout
+  ScoreCalculatorPage.ts           System Requirement Checker -> ~24 questions -> score report
 
 test-data/
   registrationData.ts       hosts, packages, test emails/domains, test cards — sourced from the Excel sheet
@@ -66,6 +67,7 @@ tests/
   registration/               free & paid registration, negative paths, payment method visibility
   login/                        login, logout, session scope
   account-security/              password reset
+  score-calculator/               System Requirement Checker through to the score report
 ```
 
 ## Test coverage
@@ -81,6 +83,7 @@ tests/
 | TC-STU-011 | Card and PayPal payment options both appear | `tests/registration/payment-method-visibility.spec.ts` |
 | TC-STU-055 | Student requests a password reset email | `tests/account-security/password-reset.spec.ts` |
 | TC-STU-057 | Password reset doesn't reveal whether an email exists | `tests/account-security/password-reset.spec.ts` |
+| TC-STU-072 | Student completes the Score Calculator (V2) and receives a score report | `tests/score-calculator/score-calculator.spec.ts` |
 
 Plus supporting specs not tied to a single TC ID: free-trial registration happy path and field validation (`tests/registration/free-registration.spec.ts`), and a duplicate-email registration check (`tests/registration/registration-negative.spec.ts`).
 
@@ -99,6 +102,7 @@ These are live-site behaviors this suite caught, distinct from failures in the t
 - **TC-STU-011 fails on every run**: the paid-registration checkout (`e2-staging-store.myshopify.com`) currently only offers **Credit Card** — no PayPal option is rendered anywhere on the page. This contradicts the Excel sheet's documented "Passed" result (Card + PayPal + Express checkout row). Possibly PayPal was disabled since that run, or the original pass used a different entry point (e.g. Upgrade/Switch Course rather than fresh paid registration).
 - **Registration auto-login ≠ a full SSO session**: right after registering, the browser can reach `Student/Home` but does **not** hold a full Azure B2C SSO session — navigating straight to the Teacher host forces a fresh login prompt instead of a silent SSO redirect. The login/session-scope specs explicitly re-authenticate through the real login form to get a comparable session to what a real user browsing normally would have.
 - Blocked email domains (`mailinator.net`, `mailinator2.com`) are rejected via a modal (`#errorDialogPane`) shown only on final form submit, not inline validation on the email field — the email input's own CSS class stays `valid` throughout.
+- **TC-STU-072's documented microphone blocker doesn't apply here**: the sheet's manual run couldn't complete the Score Calculator's Speaking/Read-Aloud questions because that environment had no microphone. Launching Chromium with `--use-fake-ui-for-media-stream --use-fake-device-for-media-stream` plus granting the `microphone`/`camera` permission (see `playwright.config.ts`) makes the RECORD/STOP widget's `MediaRecorder` produce real (silent) audio, which the app accepts — so this suite completes the full flow, including Speaking, end to end.
 
 ## Extending this suite
 
