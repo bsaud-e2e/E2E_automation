@@ -39,7 +39,11 @@ A full run takes roughly 5–6 minutes against the live staging environment — 
 
 ## Continuous Integration
 
-`.github/workflows/e2e-tests.yml` runs the full suite on every push to any branch (and can be triggered manually from the Actions tab). It type-checks, installs Chromium, runs `npm test`, and uploads the HTML report (plus traces/videos on failure) as workflow artifacts.
+`.github/workflows/e2e-tests.yml` runs the full suite on every push directly to `main`, on every pull request targeting `main` (opened, new commits pushed, or reopened), and can be triggered manually from the Actions tab. It type-checks, installs Chromium, runs `npm test`, and uploads the HTML report (plus traces/videos on failure) as workflow artifacts.
+
+Push and pull_request are deliberately non-overlapping (`push` only covers `main` itself, e.g. a merge) rather than both firing for a branch with an open PR — confirmed live that having `push: branches: ['**']` alongside `pull_request` ran the entire 3-job suite twice per push, since the two events land in different concurrency groups and don't cancel each other.
+
+To trigger a run manually (e.g. to re-run without pushing a new commit): open the repo's **Actions** tab → **E2E Tests** in the left sidebar → **Run workflow** dropdown (top right) → pick a branch → **Run workflow**. This uses the `workflow_dispatch` trigger, which works independently of push/pull_request.
 
 Since every run performs real registrations and real Shopify test-card payments against the live staging environment, pushing frequently means creating staging test accounts frequently — narrow the `on.push.branches` filter in the workflow if that becomes noisy (e.g. to `main` only).
 
