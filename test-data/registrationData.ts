@@ -52,6 +52,36 @@ export const TEST_CARDS = {
 export const PAYMENT_GATEWAY_HOST = 'https://e2-staging-store.myshopify.com';
 
 /**
+ * Reads a numbered-suffix env var group (BASE, BASE_2, BASE_3, ...) into a
+ * pool of { email, password } accounts, so a test can try more than one
+ * fallback account when the primary one runs out of usable state (e.g. no
+ * unwatched recorded class left). Always includes the un-suffixed pair
+ * first (falling back to defaultEmail/defaultPassword if that's unset),
+ * then FIXTURE_X_EMAIL_2/PASSWORD_2, _3, etc. for as many as are actually
+ * set in .env - stops at the first missing number, so the pool only grows
+ * when you add one.
+ */
+function accountPool(
+  envPrefix: string,
+  defaultEmail: string,
+  defaultPassword: string
+): { email: string; password: string }[] {
+  const pool = [
+    {
+      email: process.env[`${envPrefix}_EMAIL`] || defaultEmail,
+      password: process.env[`${envPrefix}_PASSWORD`] || defaultPassword,
+    },
+  ];
+  for (let i = 2; ; i++) {
+    const email = process.env[`${envPrefix}_EMAIL_${i}`];
+    const password = process.env[`${envPrefix}_PASSWORD_${i}`];
+    if (!email || !password) break;
+    pool.push({ email, password });
+  }
+  return pool;
+}
+
+/**
  * REUSED fixture accounts (see .env.example's "1. REUSED" section) -
  * shared, pre-existing accounts from the "Credentials & Test Data" sheet /
  * individual test cases' own Test Data fields, not created by this suite.
@@ -114,6 +144,20 @@ export const FIXTURE_ACCOUNTS = {
     password: process.env.FIXTURE_GRADED_SUBMISSION_PASSWORD || 'P@ssw0rd',
   },
 };
+
+// TC-STU-064 (paid student watches a recorded class) - the powerTier
+// account above only has a small, finite list of recorded classes, and
+// once every one of them is watched, the test has nothing left to click.
+// This pool lets it try each account in turn until it finds one with an
+// unwatched class left, rather than failing outright the moment the first
+// one runs dry. Add more fallbacks any time by setting
+// FIXTURE_POWER_TIER_EMAIL_2/PASSWORD_2, _3, etc. in .env - none are
+// required, so this is a 1-account pool (just powerTier) until you do.
+export const POWER_TIER_ACCOUNT_POOL = accountPool(
+  'FIXTURE_POWER_TIER',
+  'e2e.stu.power.260908@mailinator.com',
+  'TestPass123!'
+);
 
 // The one confirmed-graded submission on the gradedSubmission fixture
 // account (PTE Core "Write Email", activityId 1001045, Score 17) - see
