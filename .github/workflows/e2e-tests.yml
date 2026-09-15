@@ -1,12 +1,19 @@
 name: E2E Tests
 
 on:
+  # push is scoped to main only (e.g. a direct push or a merged PR) - a
+  # commit on any OTHER branch reaches CI via the pull_request trigger
+  # below instead. Both used to fire for a push to a branch with an open
+  # PR (push: branches: ['**'] + pull_request), running the entire 3-job
+  # suite twice per push since they land in different concurrency groups
+  # and don't cancel each other - confirmed live via the Actions API
+  # (two "queued" runs for the same commit SHA).
   push:
-    branches: ['**']
-  # Runs on every PR targeting main too (open, new commits pushed, or
-  # reopened) - `push` alone only fires for direct commits to a branch,
-  # never for the PR/merge-request event itself, so opening a PR from an
-  # already-pushed branch previously triggered nothing new.
+    branches: [main]
+  # Runs on every PR targeting main (opened, new commits pushed, or
+  # reopened) - `push` alone never fires for the PR/merge-request event
+  # itself, so opening a PR from an already-pushed branch previously
+  # triggered nothing new.
   pull_request:
     branches: [main]
   workflow_dispatch: {}
