@@ -3,6 +3,12 @@ name: E2E Tests
 on:
   push:
     branches: ['**']
+  # Runs on every PR targeting main too (open, new commits pushed, or
+  # reopened) - `push` alone only fires for direct commits to a branch,
+  # never for the PR/merge-request event itself, so opening a PR from an
+  # already-pushed branch previously triggered nothing new.
+  pull_request:
+    branches: [main]
   workflow_dispatch: {}
 
 concurrency:
